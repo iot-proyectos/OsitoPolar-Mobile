@@ -137,12 +137,13 @@ fun DashboardScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.dismissDeviceDetails()
-                        onNavigateToWorkOrder(temp.idDevice)
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = PolarCyan, contentColor = Color.Black)
+                        // Usamos el ID seguro que nuestro ViewModel guardó en memoria
+                        uiState.selectedDeviceId?.let { idSeguro ->
+                            onNavigateToWorkOrder(idSeguro)
+                        }
+                    }
                 ) {
-                    Text("Intervenir", fontWeight = FontWeight.Bold)
+                    Text("Intervenir")
                 }
             },
             dismissButton = {

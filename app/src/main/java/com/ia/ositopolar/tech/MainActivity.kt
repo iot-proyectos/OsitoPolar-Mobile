@@ -11,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ia.ositopolar.tech.ui.screens.DashboardScreen
+import com.ia.ositopolar.tech.ui.screens.LoginScreen
+import com.ia.ositopolar.tech.ui.screens.RegisterScreen
 import com.ia.ositopolar.tech.ui.screens.WorkOrderScreen
 import com.ia.ositopolar.tech.ui.theme.OsitoPolarTecnicoViewTheme
 
@@ -26,8 +28,39 @@ class MainActivity : ComponentActivity() {
                     // 1. Creamos el controlador de navegación
                     val navController = rememberNavController()
 
-                    // 2. Definimos las rutas de la app
-                    NavHost(navController = navController, startDestination = "dashboard") {
+                    // 2. Definimos las rutas de la app (Iniciando en "login")
+                    NavHost(navController = navController, startDestination = "login") {
+
+                        // --- RUTAS DE AUTENTICACIÓN ---
+
+                        composable("login") {
+                            LoginScreen(
+                                onLoginSuccess = {
+                                    // Viajamos al mapa y borramos el login del historial
+                                    navController.navigate("dashboard") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                },
+                                onNavigateToRegister = {
+                                    navController.navigate("register")
+                                }
+                            )
+                        }
+
+                        composable("register") {
+                            RegisterScreen(
+                                onRegisterSuccess = {
+                                    navController.navigate("dashboard") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                },
+                                onNavigateToLogin = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        // --- RUTAS PRINCIPALES DEL TÉCNICO ---
 
                         // Ruta 1: El Mapa
                         composable("dashboard") {

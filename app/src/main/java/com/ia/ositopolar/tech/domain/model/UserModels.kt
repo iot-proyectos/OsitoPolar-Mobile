@@ -1,5 +1,7 @@
 package com.ia.ositopolar.tech.domain.model
 
+import com.google.gson.annotations.SerializedName
+
 // Archivo: UserModels.kt
 enum class TypeSubs {
     NONE, BOUGHT, RENTING, BUSINESS
@@ -20,6 +22,14 @@ data class User(
     val idSubcription: Subscription? = null
 )
 
+// --- NUEVO DTO PARA AUTENTICACIÓN ---
+// Esto le dice a Kotlin: "Cuando inicie sesión, recibiré un token y opcionalmente los datos del usuario"
+data class AuthResponseData(
+    val token: String? = null,
+    val accessToken: String? = null,
+    val user: User? = null
+)
+
 // Archivo: TelemetryModels.kt
 data class Device(
     val id: String,
@@ -29,7 +39,7 @@ data class Device(
 data class Temperature(
     val id: String,
     val celsius: Float,
-    val idDevice: String
+    @SerializedName("deviceId") val idDevice: String
 )
 
 data class Humidity(
@@ -49,14 +59,20 @@ data class UserMetrics(
 // Archivo: MappingModels.kt
 data class Section(
     val id: String,
-    val imagen: String, // URL o Base64
+    @SerializedName("imageUrl") val imagen: String,
     val userId: String,
     val devices: List<Device> = emptyList()
 )
 
 data class Mapping(
-    val idSection: String,
-    val idDevice: String,
+    val id: String,
     val x: Float,
-    val y: Float
-)
+    val y: Float,
+    val device: Device // <--- Ahora recibimos el objeto completo, tal como viene en el JSON
+) {
+    // Agregamos este pequeño truco (propiedad calculada) para que no tengas
+    // que modificar tu DashboardScreen ni tu ViewModel.
+    // Cuando el código pida 'idDevice', simplemente sacará el ID de adentro del objeto.
+    val idDevice: String
+        get() = device.id
+}

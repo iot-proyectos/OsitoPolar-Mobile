@@ -2,6 +2,7 @@ package com.ia.ositopolar.tech.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ia.ositopolar.tech.data.remote.NetworkModule
 import com.ia.ositopolar.tech.data.repository.MockOsitoPolarRepository
 import com.ia.ositopolar.tech.domain.model.Humidity
 import com.ia.ositopolar.tech.domain.model.Temperature
@@ -21,7 +22,7 @@ data class WorkOrderUiState(
 )
 
 class WorkOrderViewModel(
-    private val repository: OsitoPolarRepository = MockOsitoPolarRepository()
+    private val repository: OsitoPolarRepository = NetworkModule.repository // <--- CAMBIO AQUÍ
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkOrderUiState())

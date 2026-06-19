@@ -24,12 +24,22 @@ class MockOsitoPolarRepository : OsitoPolarRepository {
     }
 
     override suspend fun getDeviceMappings(sectionId: String): Result<List<Mapping>> {
-        delay(500)
-        val mappings = listOf(
-            Mapping(idSection = sectionId, idDevice = "DEV-001", x = 120.5f, y = 340.0f),
-            Mapping(idSection = sectionId, idDevice = "DEV-002", x = 500.0f, y = 450.5f)
+        // Simulamos una respuesta exitosa con los nuevos parámetros
+        val mockMappings = listOf(
+            Mapping(
+                id = "mock-map-1",
+                x = 150f,
+                y = 250f,
+                device = Device(id = "DEV-001") // Creamos un dispositivo de prueba dentro
+            ),
+            Mapping(
+                id = "mock-map-2",
+                x = 300f,
+                y = 400f,
+                device = Device(id = "DEV-002")
+            )
         )
-        return Result.success(mappings)
+        return Result.success(mockMappings)
     }
 
     override suspend fun getDeviceTemperature(deviceId: String): Result<Temperature> {
