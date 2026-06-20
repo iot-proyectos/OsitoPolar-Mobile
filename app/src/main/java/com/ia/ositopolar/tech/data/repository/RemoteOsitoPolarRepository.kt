@@ -1,6 +1,7 @@
 package com.ia.ositopolar.tech.data.repository
 
 import com.ia.ositopolar.tech.data.remote.OsitoPolarApi
+import com.ia.ositopolar.tech.domain.model.CreateDeviceRequest
 import com.ia.ositopolar.tech.domain.model.Humidity
 import com.ia.ositopolar.tech.domain.model.Mapping
 import com.ia.ositopolar.tech.domain.model.Section
@@ -57,10 +58,11 @@ class RemoteOsitoPolarRepository(
     override suspend fun getDeviceHumidity(deviceId: String): Result<Humidity> {
         return try {
             val response = api.getCurrentHumidity(deviceId)
-            if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
-                Result.success(response.body()!!.data!!)
+            if (response.isSuccessful) {
+                response.body()?.data?.let { Result.success(it) }
+                    ?: Result.failure(Exception("Cuerpo vacío"))
             } else {
-                Result.failure(Exception("Error en la API: ${response.code()}"))
+                Result.failure(Exception("Error en humedad: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -75,6 +77,21 @@ class RemoteOsitoPolarRepository(
                 Result.success(true)
             } else {
                 Result.failure(Exception("Error al guardar: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun createDevice(name: String, serialNumber: String, x: Float, y: Float): Result<Boolean> {
+        return try {
+            val request = CreateDeviceRequest(name, serialNumber, x, y)
+            val response = api.createDevice(request)
+
+            if (response.isSuccessful) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Error al crear equipo: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

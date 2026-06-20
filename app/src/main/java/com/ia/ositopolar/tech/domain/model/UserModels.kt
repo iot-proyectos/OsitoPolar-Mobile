@@ -76,3 +76,9 @@ data class Mapping(
     val idDevice: String
         get() = device.id
 }
+data class CreateDeviceRequest(
+    val name: String,
+    val serialNumber: String,
+    val coordinateX: Float,
+    val coordinateY: Float
+)

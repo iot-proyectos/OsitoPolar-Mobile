@@ -55,6 +55,16 @@ class MockOsitoPolarRepository : OsitoPolarRepository {
         delay(1000) // Simulamos que viaja por internet
         return Result.success(true) // Siempre responde "Éxito" en el mock
     }
+    override suspend fun createDevice(name: String, serialNumber: String, x: Float, y: Float): Result<Boolean> {
+        // 1. Simulamos que viaja por internet (medio segundo)
+        kotlinx.coroutines.delay(500)
+
+        // 2. Imprimimos en consola para saber que el Mock está funcionando
+        println("OSITOPOLAR_DEBUG: [MOCK] Fingiendo crear el equipo '$name' (Serie: $serialNumber) en X:$x, Y:$y")
+
+        // 3. Devolvemos un éxito rotundo
+        return Result.success(true)
+    }
 }
 
 // Instancia real usando Retrofit (LUEGO DE QUE TENGAMOS EL BACK)

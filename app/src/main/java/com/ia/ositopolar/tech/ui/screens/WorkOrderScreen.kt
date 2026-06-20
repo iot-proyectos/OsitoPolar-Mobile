@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import com.ia.ositopolar.tech.ui.theme.*
+import androidx.compose.material.icons.filled.ArrowBack
 
 @Composable
 fun TelemetryWidget(deviceId: String, temperature: Float?, humidity: Float?) {
@@ -147,10 +148,10 @@ fun WorkOrderScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // --- NUEVO: Estado para guardar la ruta de la imagen ---
+    // --- Estado para guardar la ruta de la imagen ---
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // --- NUEVO: Lanzador del PhotoPicker nativo de Android ---
+    // --- Lanzador del PhotoPicker nativo de Android ---
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> selectedImageUri = uri }
@@ -166,10 +167,34 @@ fun WorkOrderScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        Text(text = "Orden de Trabajo", fontSize = 28.sp, color = PolarTextWhite, fontWeight = FontWeight.ExtraBold)
-        Text(text = "Registro de mantenimiento y diagnóstico", fontSize = 14.sp, color = PolarTextGray)
-
-        Spacer(modifier = Modifier.height(24.dp))
+        // --- HEADER ACTUALIZADO CON FLECHA DE REGRESO ---
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Volver al mapa",
+                    tint = PolarCyan
+                )
+            }
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                Text(
+                    text = "Orden de Trabajo",
+                    fontSize = 28.sp,
+                    color = PolarTextWhite,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    text = "Registro de mantenimiento y diagnóstico",
+                    fontSize = 14.sp,
+                    color = PolarTextGray
+                )
+            }
+        }
 
         if (uiState.isLoadingTelemetry) {
             Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
@@ -204,7 +229,7 @@ fun WorkOrderScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- NUEVO: SECCIÓN DE EVIDENCIA FOTOGRÁFICA ---
+        // --- SECCIÓN DE EVIDENCIA FOTOGRÁFICA ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -217,9 +242,9 @@ fun WorkOrderScreen(
                 },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = PolarCyan),
-                border = BorderStroke(1.dp, PolarCyan) // <--- Borde corregido
+                border = BorderStroke(1.dp, PolarCyan)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Subir foto") // <--- Ícono corregido
+                Icon(Icons.Default.Add, contentDescription = "Subir foto")
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Adjuntar Evidencia")
             }
@@ -244,11 +269,10 @@ fun WorkOrderScreen(
 
         // --- BOTÓN PRINCIPAL INTELIGENTE ---
         Button(
-            // Al hacer clic, llamamos a la nueva función del ViewModel
             onClick = {
                 viewModel.saveWorkOrder(
                     deviceId = deviceId,
-                    onSuccess = onBackClick // Si sale bien, ejecuta el retroceso
+                    onSuccess = onBackClick
                 )
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -256,11 +280,10 @@ fun WorkOrderScreen(
             colors = ButtonDefaults.buttonColors(
                 containerColor = PolarCyan,
                 contentColor = Color.Black,
-                disabledContainerColor = PolarCyan.copy(alpha = 0.5f) // Color apagado mientras carga
+                disabledContainerColor = PolarCyan.copy(alpha = 0.5f)
             ),
-            enabled = !uiState.isSaving // Bloqueamos el botón para evitar doble envío
+            enabled = !uiState.isSaving
         ) {
-            // Mostramos un círculo giratorio o el texto dependiendo del estado
             if (uiState.isSaving) {
                 CircularProgressIndicator(
                     color = Color.Black,

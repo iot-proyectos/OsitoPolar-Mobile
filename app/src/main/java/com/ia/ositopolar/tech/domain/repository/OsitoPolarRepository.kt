@@ -12,5 +12,6 @@ interface OsitoPolarRepository {
     suspend fun getDeviceTemperature(deviceId: String): Result<Temperature>
     suspend fun getDeviceHumidity(deviceId: String): Result<Humidity>
     suspend fun saveWorkOrder(request: WorkOrderRequest): Result<Boolean>
+    suspend fun createDevice(name: String, serialNumber: String, x: Float, y: Float): Result<Boolean>
 }
 

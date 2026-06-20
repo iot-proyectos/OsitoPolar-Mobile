@@ -9,6 +9,7 @@ import com.ia.ositopolar.tech.domain.model.Temperature
 import com.ia.ositopolar.tech.domain.model.User
 import com.ia.ositopolar.tech.domain.model.UserMetrics
 import com.ia.ositopolar.tech.domain.model.AuthResponseData
+import com.ia.ositopolar.tech.domain.model.CreateDeviceRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -70,6 +71,11 @@ interface OsitoPolarApi {
     // --- WORK ORDERS (MANTENIMIENTO) ---
     @POST("workorder")
     suspend fun createWorkOrder(@Body request: com.ia.ositopolar.tech.domain.model.WorkOrderRequest): Response<ApiResponse<Any>>
+
+    @POST("devices") // O la ruta que use tu backend para crear equipos
+    suspend fun createDevice(
+        @Body request: CreateDeviceRequest
+    ): Response<ApiResponse<Any>> // Ajusta el 'Any' si el backend te devuelve el equipo creado
 }
 
 // Ver anterior

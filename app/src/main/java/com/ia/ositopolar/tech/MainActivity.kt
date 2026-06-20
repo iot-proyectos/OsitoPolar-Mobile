@@ -14,6 +14,7 @@ import com.ia.ositopolar.tech.ui.screens.DashboardScreen
 import com.ia.ositopolar.tech.ui.screens.LoginScreen
 import com.ia.ositopolar.tech.ui.screens.RegisterScreen
 import com.ia.ositopolar.tech.ui.screens.WorkOrderScreen
+import com.ia.ositopolar.tech.ui.screens.ManagementScreen // <--- IMPORTANTE: Importamos la nueva pantalla
 import com.ia.ositopolar.tech.ui.theme.OsitoPolarTecnicoViewTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,8 +67,10 @@ class MainActivity : ComponentActivity() {
                         composable("dashboard") {
                             DashboardScreen(
                                 onNavigateToWorkOrder = { deviceId ->
-                                    // Cuando le den al botón del popup, navegamos a "work_order/DEV-001"
                                     navController.navigate("work_order/$deviceId")
+                                },
+                                onNavigateToManagement = { // <--- CONECTAMOS EL BOTÓN DEL ENGRANAJE AQUÍ
+                                    navController.navigate("management")
                                 }
                             )
                         }
@@ -81,6 +84,16 @@ class MainActivity : ComponentActivity() {
                                 deviceId = deviceId,
                                 onBackClick = {
                                     // Regresamos al mapa
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        // --- NUEVA RUTA 3: PANEL DE GESTIÓN ---
+                        composable("management") {
+                            ManagementScreen(
+                                onNavigateBack = {
+                                    // Regresamos al mapa usando la flecha
                                     navController.popBackStack()
                                 }
                             )

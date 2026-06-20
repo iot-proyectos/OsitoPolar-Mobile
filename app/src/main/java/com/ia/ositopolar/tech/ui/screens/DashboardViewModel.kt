@@ -6,6 +6,7 @@ import com.ia.ositopolar.tech.data.remote.NetworkModule
 import com.ia.ositopolar.tech.domain.model.Mapping
 import com.ia.ositopolar.tech.domain.model.Section
 import com.ia.ositopolar.tech.domain.model.Temperature
+import com.ia.ositopolar.tech.domain.model.Humidity // <--- IMPORTANTE: Importar el modelo de humedad
 import com.ia.ositopolar.tech.domain.repository.OsitoPolarRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ data class DashboardUiState(
     val mappings: List<Mapping> = emptyList(),
     val errorMessage: String? = null,
     val selectedTemperature: Temperature? = null,
-    val selectedDeviceId: String? = null // <--- 1. NUEVA VARIABLE PARA RECORDAR EL ID
+    val selectedHumidity: Humidity? = null, // <--- 1. NUEVA VARIABLE PARA LA HUMEDAD
+    val selectedDeviceId: String? = null
 )
 
 class DashboardViewModel(
@@ -29,11 +31,10 @@ class DashboardViewModel(
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     init {
-        // En un futuro tomaremos el ID del SessionManager, por ahora cargamos con un valor por defecto
         loadDashboardData(userId = "USER-123")
     }
 
-    private fun loadDashboardData(userId: String) {
+    fun loadDashboardData(userId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
@@ -81,19 +82,22 @@ class DashboardViewModel(
 
         viewModelScope.launch {
             try {
-                println("OSITOPOLAR_DEBUG: Tocaste el pin. Buscando temperatura para: $deviceId")
+                println("OSITOPOLAR_DEBUG: Tocaste el pin. Buscando telemetría para: $deviceId")
 
-                // 2. GUARDAMOS EL ID EN EL ESTADO INMEDIATAMENTE
                 _uiState.value = _uiState.value.copy(selectedDeviceId = deviceId)
 
+                // 2. HACEMOS AMBAS PETICIONES DE RED
                 val tempResult = repository.getDeviceTemperature(deviceId)
+                val humResult = repository.getDeviceHumidity(deviceId)
 
-                tempResult.onSuccess { temp ->
-                    println("OSITOPOLAR_DEBUG: ¡Éxito! Temperatura recibida: ${temp.celsius}")
-                    _uiState.value = _uiState.value.copy(selectedTemperature = temp)
-                }.onFailure { error ->
-                    println("OSITOPOLAR_DEBUG: Falló la respuesta del servidor: ${error.message}")
-                }
+                println("OSITOPOLAR_DEBUG: Datos recibidos -> Temp: ${tempResult.getOrNull()?.celsius}, Hum: ${humResult.getOrNull()?.percentage}")
+
+                // 3. ACTUALIZAMOS EL ESTADO DE GOLPE
+                _uiState.value = _uiState.value.copy(
+                    selectedTemperature = tempResult.getOrNull(),
+                    selectedHumidity = humResult.getOrNull()
+                )
+
             } catch (e: Exception) {
                 println("OSITOPOLAR_DEBUG: CRASH INTERCEPTADO 🚨 -> ${e.message}")
                 e.printStackTrace()
@@ -102,9 +106,10 @@ class DashboardViewModel(
     }
 
     fun dismissDeviceDetails() {
-        // 3. LIMPIAMOS EL ID AL CERRAR LA TARJETA
+        // 4. LIMPIAMOS LA HUMEDAD AL CERRAR LA TARJETA
         _uiState.value = _uiState.value.copy(
             selectedTemperature = null,
+            selectedHumidity = null,
             selectedDeviceId = null
         )
     }
