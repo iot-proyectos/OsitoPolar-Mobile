@@ -8,7 +8,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object NetworkModule {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/v1/"
+    //private const val BASE_URL = "http://10.0.2.2:3000/api/v1/"
+    const val BASE_URL = "https://ositopolar-backend-production.up.railway.app/api/v1/"
 
     // 1. Creamos nuestro interceptor de "Rayos X"
     private val loggingInterceptor = HttpLoggingInterceptor { message ->
